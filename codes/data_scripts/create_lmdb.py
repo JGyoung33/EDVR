@@ -15,8 +15,8 @@ import utils.util as util  # noqa: E402
 
 
 def main():
-    dataset = 'DIV2K_demo'  # vimeo90K | REDS | general (e.g., DIV2K, 291) | DIV2K_demo |test
-    mode = 'GT'  # used for vimeo90k and REDS datasets
+    dataset = 'REDS'  # vimeo90K | REDS | general (e.g., DIV2K, 291) | DIV2K_demo |test
+    mode = 'train_sharp_bicubic'  # used for vimeo90k and REDS datasets
     # vimeo90k: GT | LR | flow
     # REDS: train_sharp, train_sharp_bicubic, train_blur_bicubic, train_blur, train_blur_comp
     #       train_sharp_flowx4
@@ -294,16 +294,20 @@ def REDS(mode):
         lmdb_save_path = '../../datasets/REDS/train_sharp_wval.lmdb'
         H_dst, W_dst = 720, 1280
     elif mode == 'train_sharp_bicubic':
-        img_folder = '../../datasets/REDS/train_sharp_bicubic'
-        lmdb_save_path = '../../datasets/REDS/train_sharp_bicubic_wval.lmdb'
+        img_folder = '/data1/young/train_sharp_bicubic'
+        lmdb_save_path = '/data1/young/train_sharp_bicubic_lmdb/train_blur_wval.lmdb'
+        #img_folder = '../../datasets/REDS/train_sharp_bicubic'
+        #lmdb_save_path = '../../datasets/REDS/train_sharp_bicubic_wval.lmdb'
         H_dst, W_dst = 180, 320
     elif mode == 'train_blur_bicubic':
         img_folder = '../../datasets/REDS/train_blur_bicubic'
         lmdb_save_path = '../../datasets/REDS/train_blur_bicubic_wval.lmdb'
+        #img_folder = '../../datasets/REDS/train_blur_bicubic'
+        #lmdb_save_path = '../../datasets/REDS/train_blur_bicubic_wval.lmdb'
         H_dst, W_dst = 180, 320
     elif mode == 'train_blur':
-        img_folder = '../../datasets/REDS/train_blur'
-        lmdb_save_path = '../../datasets/REDS/train_blur_wval.lmdb'
+        img_folder = '/data1/young/train_sharp_bicubic'
+        lmdb_save_path = '/data1/young/train_sharp_bicubic_lmdb/train_blur_wval.lmdb'
         H_dst, W_dst = 720, 1280
     elif mode == 'train_blur_comp':
         img_folder = '../../datasets/REDS/train_blur_comp'
