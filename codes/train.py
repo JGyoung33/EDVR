@@ -33,7 +33,10 @@ def main():
                         help='job launcher')
     parser.add_argument('--local_rank', type=int, default=0)
     args = parser.parse_args()
+    args.opt = './codes/options/train/train_EDVR_woTSA_M.yml'
     opt = option.parse(args.opt, is_train=True)
+
+
 
     #### distributed training settings
     if args.launcher == 'none':  # disabled distributed training

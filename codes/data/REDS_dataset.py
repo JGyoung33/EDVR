@@ -130,7 +130,7 @@ class REDSDataset(data.Dataset):
             else:
                 neighbor_list = list(
                     range(center_frame_idx, center_frame_idx - interval * N_frames, -interval))
-            name_b = '{:08d}'.format(neighbor_list[0])
+            name_b = '{:04d}'.format(neighbor_list[0])
         else:
             # ensure not exceeding the borders
             while (center_frame_idx + self.half_N_frames * interval >
@@ -142,7 +142,7 @@ class REDSDataset(data.Dataset):
                       center_frame_idx + self.half_N_frames * interval + 1, interval))
             if self.random_reverse and random.random() < 0.5:
                 neighbor_list.reverse()
-            name_b = '{:08d}'.format(neighbor_list[self.half_N_frames])
+            name_b = '{:04d}'.format(neighbor_list[self.half_N_frames])
 
         assert len(
             neighbor_list) == self.opt['N_frames'], 'Wrong length of neighbor list: {}'.format(
@@ -153,23 +153,23 @@ class REDSDataset(data.Dataset):
             img_GT = self._read_img_mc_BGR(self.GT_root, name_a, name_b)
             img_GT = img_GT.astype(np.float32) / 255.
         elif self.data_type == 'lmdb':
-            img_GT = util.read_img(self.GT_env, key, (3, 720, 1280))
+            img_GT = util.read_img(self.GT_env, key, (3, 2160, 3840))
         else:
             img_GT = util.read_img(None, osp.join(self.GT_root, name_a, name_b + '.png'))
 
         #### get LQ images
-        LQ_size_tuple = (3, 180, 320) if self.LR_input else (3, 720, 1280)
+        LQ_size_tuple = (3, 540,960 ) if self.LR_input else (3, 2160, 3840)
         img_LQ_l = []
         for v in neighbor_list:
-            img_LQ_path = osp.join(self.LQ_root, name_a, '{:08d}.png'.format(v))
+            img_LQ_path = osp.join(self.LQ_root, name_a, '{:04d}.png'.format(v))
             if self.data_type == 'mc':
                 if self.LR_input:
                     img_LQ = self._read_img_mc(img_LQ_path)
                 else:
-                    img_LQ = self._read_img_mc_BGR(self.LQ_root, name_a, '{:08d}'.format(v))
+                    img_LQ = self._read_img_mc_BGR(self.LQ_root, name_a, '{:04d}'.format(v))
                 img_LQ = img_LQ.astype(np.float32) / 255.
             elif self.data_type == 'lmdb':
-                img_LQ = util.read_img(self.LQ_env, '{}_{:08d}'.format(name_a, v), LQ_size_tuple)
+                img_LQ = util.read_img(self.LQ_env, '{}_{:04d}'.format(name_a, v), LQ_size_tuple)
             else:
                 img_LQ = util.read_img(None, img_LQ_path)
             img_LQ_l.append(img_LQ)
