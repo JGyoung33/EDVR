@@ -36,8 +36,7 @@ def main():
             raise ValueError('Vid4 does not support stage 2.')
     elif data_mode == 'sharp_bicubic':
         if stage == 1:
-            model_path = './experiments/pretrained_models/EDVR_REDS_SR_L.pth'
-            model_path='./experiments/001_EDVRwoTSA_scratch_lr4e-4_600k_REDS_LrCAR4S/models/2500_G.pth'
+            model_path = '../experiments/pretrained_models/EDVR_REDS_SR_L.pth'
         else:
             model_path = '../experiments/pretrained_models/EDVR_REDS_SR_Stage2.pth'
     elif data_mode == 'blur_bicubic':
@@ -64,7 +63,7 @@ def main():
         N_in = 5
 
     predeblur, HR_in = False, False
-    back_RBs = 10
+    back_RBs = 40
     if data_mode == 'blur_bicubic':
         predeblur = True
     if data_mode == 'blur' or data_mode == 'blur_comp':
@@ -72,19 +71,19 @@ def main():
     if stage == 2:
         HR_in = True
         back_RBs = 20
-    model = EDVR_arch.EDVR(64, N_in, 8, 5, back_RBs, predeblur=predeblur, HR_in=HR_in,w_TSA=False)
+    model = EDVR_arch.EDVR(128, N_in, 8, 5, back_RBs, predeblur=predeblur, HR_in=HR_in)
+
     #### dataset
     if data_mode == 'Vid4':
         test_dataset_folder = '../datasets/Vid4/BIx4'
         GT_dataset_folder = '../datasets/Vid4/GT'
     else:
         if stage == 1:
-            test_dataset_folder = './datasets/SDR_540p-test'
-            #test_dataset_folder = './datasets/REDS4/{}'.format(data_mode)
+            test_dataset_folder = '../datasets/REDS4/{}'.format(data_mode)
         else:
             test_dataset_folder = '../results/REDS-EDVR_REDS_SR_L_flipx4'
             print('You should modify the test_dataset_folder path for stage 2')
-        GT_dataset_folder = './datasets/SDR/GT'
+        GT_dataset_folder = '../datasets/REDS4/GT'
 
     #### evaluation
     crop_border = 0
@@ -96,7 +95,7 @@ def main():
         padding = 'replicate'
     save_imgs = True
 
-    save_folder = '/data1/young/results/edvr-2000/'
+    save_folder = '../results/{}'.format(data_mode)
     util.mkdirs(save_folder)
     util.setup_logger('base', save_folder, 'test', level=logging.INFO, screen=True, tofile=True)
     logger = logging.getLogger('base')
@@ -112,7 +111,6 @@ def main():
     model.load_state_dict(torch.load(model_path), strict=True)
     model.eval()
     model = model.to(device)
-    #model = torch.nn.DataParallel(model,device_ids=[1,2,3])
 
     avg_psnr_l, avg_psnr_center_l, avg_psnr_border_l = [], [], []
     subfolder_name_l = []

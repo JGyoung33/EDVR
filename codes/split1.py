@@ -37,7 +37,7 @@ def main():
     elif data_mode == 'sharp_bicubic':
         if stage == 1:
             model_path = './experiments/pretrained_models/EDVR_REDS_SR_L.pth'
-            model_path='./experiments/001_EDVRwoTSA_scratch_lr4e-4_600k_REDS_LrCAR4S/models/2500_G.pth'
+            model_path='../experiments/002_EDVR_EDVRwoTSAIni_lr4e-4_600k_REDS_LrCAR4S_fixTSA50k_new/models/4800_G.pth'
         else:
             model_path = '../experiments/pretrained_models/EDVR_REDS_SR_Stage2.pth'
     elif data_mode == 'blur_bicubic':
@@ -72,19 +72,19 @@ def main():
     if stage == 2:
         HR_in = True
         back_RBs = 20
-    model = EDVR_arch.EDVR(64, N_in, 8, 5, back_RBs, predeblur=predeblur, HR_in=HR_in,w_TSA=False)
+    model = EDVR_arch.EDVR(64, N_in, 8, 5, back_RBs, predeblur=predeblur, HR_in=HR_in,w_TSA=True)
     #### dataset
     if data_mode == 'Vid4':
         test_dataset_folder = '../datasets/Vid4/BIx4'
         GT_dataset_folder = '../datasets/Vid4/GT'
     else:
         if stage == 1:
-            test_dataset_folder = './datasets/SDR_540p-test'
+            test_dataset_folder = '../datasets/SDR_540p-test/split1'
             #test_dataset_folder = './datasets/REDS4/{}'.format(data_mode)
         else:
             test_dataset_folder = '../results/REDS-EDVR_REDS_SR_L_flipx4'
             print('You should modify the test_dataset_folder path for stage 2')
-        GT_dataset_folder = './datasets/SDR/GT'
+        GT_dataset_folder = '../datasets/SDR/GT/split1'
 
     #### evaluation
     crop_border = 0
@@ -96,7 +96,7 @@ def main():
         padding = 'replicate'
     save_imgs = True
 
-    save_folder = '/data1/young/results/edvr-2000/'
+    save_folder = '/data1/young/results/edvr2-4800/'
     util.mkdirs(save_folder)
     util.setup_logger('base', save_folder, 'test', level=logging.INFO, screen=True, tofile=True)
     logger = logging.getLogger('base')
@@ -154,56 +154,57 @@ def main():
                 cv2.imwrite(osp.join(save_subfolder, '{}.png'.format(img_name)), output)
 
             # calculate PSNR
-            output = output / 255.
-            GT = np.copy(img_GT_l[img_idx])
-            # For REDS, evaluate on RGB channels; for Vid4, evaluate on the Y channel
-            if data_mode == 'Vid4':  # bgr2y, [0, 1]
-                GT = data_util.bgr2ycbcr(GT, only_y=True)
-                output = data_util.bgr2ycbcr(output, only_y=True)
+            # output = output / 255.
+            # GT = np.copy(img_GT_l[img_idx])
+            # # For REDS, evaluate on RGB channels; for Vid4, evaluate on the Y channel
+            # if data_mode == 'Vid4':  # bgr2y, [0, 1]
+            #     GT = data_util.bgr2ycbcr(GT, only_y=True)
+            #     output = data_util.bgr2ycbcr(output, only_y=True)
 
-            output, GT = util.crop_border([output, GT], crop_border)
-            crt_psnr = util.calculate_psnr(output * 255, GT * 255)
+            # output, GT = util.crop_border([output, GT], crop_border)
+            # crt_psnr = util.calculate_psnr(output * 255, GT * 255)
+            crt_psnr = 0
             logger.info('{:3d} - {:25} \tPSNR: {:.6f} dB'.format(img_idx + 1, img_name, crt_psnr))
 
-            if img_idx >= border_frame and img_idx < max_idx - border_frame:  # center frames
-                avg_psnr_center += crt_psnr
-                N_center += 1
-            else:  # border frames
-                avg_psnr_border += crt_psnr
-                N_border += 1
+    #         if img_idx >= border_frame and img_idx < max_idx - border_frame:  # center frames
+    #             avg_psnr_center += crt_psnr
+    #             N_center += 1
+    #         else:  # border frames
+    #             avg_psnr_border += crt_psnr
+    #             N_border += 1
 
-        avg_psnr = (avg_psnr_center + avg_psnr_border) / (N_center + N_border)
-        avg_psnr_center = avg_psnr_center / N_center
-        avg_psnr_border = 0 if N_border == 0 else avg_psnr_border / N_border
-        avg_psnr_l.append(avg_psnr)
-        avg_psnr_center_l.append(avg_psnr_center)
-        avg_psnr_border_l.append(avg_psnr_border)
+    #     avg_psnr = (avg_psnr_center + avg_psnr_border) / (N_center + N_border)
+    #     avg_psnr_center = avg_psnr_center / N_center
+    #     avg_psnr_border = 0 if N_border == 0 else avg_psnr_border / N_border
+    #     avg_psnr_l.append(avg_psnr)
+    #     avg_psnr_center_l.append(avg_psnr_center)
+    #     avg_psnr_border_l.append(avg_psnr_border)
 
-        logger.info('Folder {} - Average PSNR: {:.6f} dB for {} frames; '
-                    'Center PSNR: {:.6f} dB for {} frames; '
-                    'Border PSNR: {:.6f} dB for {} frames.'.format(subfolder_name, avg_psnr,
-                                                                   (N_center + N_border),
-                                                                   avg_psnr_center, N_center,
-                                                                   avg_psnr_border, N_border))
+    #     logger.info('Folder {} - Average PSNR: {:.6f} dB for {} frames; '
+    #                 'Center PSNR: {:.6f} dB for {} frames; '
+    #                 'Border PSNR: {:.6f} dB for {} frames.'.format(subfolder_name, avg_psnr,
+    #                                                                (N_center + N_border),
+    #                                                                avg_psnr_center, N_center,
+    #                                                                avg_psnr_border, N_border))
 
-    logger.info('################ Tidy Outputs ################')
-    for subfolder_name, psnr, psnr_center, psnr_border in zip(subfolder_name_l, avg_psnr_l,
-                                                              avg_psnr_center_l, avg_psnr_border_l):
-        logger.info('Folder {} - Average PSNR: {:.6f} dB. '
-                    'Center PSNR: {:.6f} dB. '
-                    'Border PSNR: {:.6f} dB.'.format(subfolder_name, psnr, psnr_center,
-                                                     psnr_border))
-    logger.info('################ Final Results ################')
-    logger.info('Data: {} - {}'.format(data_mode, test_dataset_folder))
-    logger.info('Padding mode: {}'.format(padding))
-    logger.info('Model path: {}'.format(model_path))
-    logger.info('Save images: {}'.format(save_imgs))
-    logger.info('Flip test: {}'.format(flip_test))
-    logger.info('Total Average PSNR: {:.6f} dB for {} clips. '
-                'Center PSNR: {:.6f} dB. Border PSNR: {:.6f} dB.'.format(
-                    sum(avg_psnr_l) / len(avg_psnr_l), len(subfolder_l),
-                    sum(avg_psnr_center_l) / len(avg_psnr_center_l),
-                    sum(avg_psnr_border_l) / len(avg_psnr_border_l)))
+    # logger.info('################ Tidy Outputs ################')
+    # for subfolder_name, psnr, psnr_center, psnr_border in zip(subfolder_name_l, avg_psnr_l,
+    #                                                           avg_psnr_center_l, avg_psnr_border_l):
+    #     logger.info('Folder {} - Average PSNR: {:.6f} dB. '
+    #                 'Center PSNR: {:.6f} dB. '
+    #                 'Border PSNR: {:.6f} dB.'.format(subfolder_name, psnr, psnr_center,
+    #                                                  psnr_border))
+    # logger.info('################ Final Results ################')
+    # logger.info('Data: {} - {}'.format(data_mode, test_dataset_folder))
+    # logger.info('Padding mode: {}'.format(padding))
+    # logger.info('Model path: {}'.format(model_path))
+    # logger.info('Save images: {}'.format(save_imgs))
+    # logger.info('Flip test: {}'.format(flip_test))
+    # logger.info('Total Average PSNR: {:.6f} dB for {} clips. '
+    #             'Center PSNR: {:.6f} dB. Border PSNR: {:.6f} dB.'.format(
+    #                 sum(avg_psnr_l) / len(avg_psnr_l), len(subfolder_l),
+    #                 sum(avg_psnr_center_l) / len(avg_psnr_center_l),
+    #                 sum(avg_psnr_border_l) / len(avg_psnr_border_l)))
 
 
 if __name__ == '__main__':

@@ -4,7 +4,7 @@ use_tb_logger: true
 model: video_base
 distortion: sr
 scale: 4
-gpu_ids: [0,1,2,3,4,5,6,7]
+gpu_ids: [0,1,2,3]
 
 #### datasets
 datasets:
@@ -14,8 +14,10 @@ datasets:
     interval_list: [1]
     random_reverse: false
     border_mode: false
-    dataroot_GT: ../datasets/REDS/train_sharp_wval.lmdb
-    dataroot_LQ: ../datasets/REDS/train_sharp_bicubic_wval.lmdb
+    dataroot_GT: /data/young/4k-test/SDR_4k-lmdb/train_sharp_wval.lmdb
+    dataroot_LQ: /data/young/4k-test/SDR_540p-lmdb/train_sharp_bicubic_wval.lmdb
+    #dataroot_GT: ../datasets/REDS/train_sharp_wval.lmdb
+    #dataroot_LQ: ../datasets/REDS/train_sharp_bicubic_wval.lmdb
     cache_keys: ~
 
     N_frames: 5
