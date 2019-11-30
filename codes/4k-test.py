@@ -72,7 +72,7 @@ def main():
     if stage == 2:
         HR_in = True
         back_RBs = 20
-    model = EDVR_arch.EDVR(64, N_in, 8, 5, back_RBs, predeblur=predeblur, HR_in=HR_in,w_TSA=True)
+    model = EDVR_arch.EDVR(64, N_in, 8, 5, back_RBs, predeblur=predeblur, HR_in=HR_in,w_TSA=False)
     #### dataset
     if data_mode == 'Vid4':
         test_dataset_folder = '../datasets/Vid4/BIx4'
