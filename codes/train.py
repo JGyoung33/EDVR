@@ -33,7 +33,7 @@ def main():
                         help='job launcher')
     parser.add_argument('--local_rank', type=int, default=0)
     args = parser.parse_args()
-    args.opt = './codes/options/train/train_EDVR_woTSA_M.yml'
+    args.opt = '../codes/options/train/train_4k-stage1.yml'
     opt = option.parse(args.opt, is_train=True)
 
 
